@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ZOF — Zero of Functions Solver</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body{font-family:Inter,system-ui,Arial;padding:18px;max-width:900px;margin:auto}
+    .form-row{margin-bottom:8px}
+    label{display:block;font-weight:600;margin-bottom:4px}
+    input[type=text], select {width:100%; padding:6px 8px; box-sizing:border-box}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:6px;border:1px solid #ddd;text-align:left}
+    .error{color:#b00;background:#ffd7d7;padding:8px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h2>ZOF — Zero of Functions Solver</h2>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post">
+    <div class="form-row">
+      <label>Function f(x)</label>
+      <input name="f" placeholder="e.g. x**3 - x - 2" required value="{{ f_str if f_str is defined else '' }}">
+    </div>
+
+    <div class="form-row">
+      <label>Method</label>
+      <select name="method" required>
+        <option value="bisection">Bisection</option>
+        <option value="regula">Regula Falsi</option>
+        <option value="secant">Secant</option>
+        <option value="newton">Newton-Raphson</option>
+        <option value="fixed">Fixed Point</option>
+        <option value="modified_secant">Modified Secant</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Tolerance</label>
+      <input name="tol" value="1e-6">
+    </div>
+    <div class="form-row">
+      <label>Max iterations</label>
+      <input name="max_iter" value="50">
+    </div>
+
+    <div class="form-row">
+      <label>Method-specific inputs (leave unused blank)</label>
+      <input name="a" placeholder="a (for bisection/regula)">
+      <input name="b" placeholder="b (for bisection/regula)">
+      <input name="x0" placeholder="x0 (initial guess)">
+      <input name="x1" placeholder="x1 (secant second guess)">
+      <input name="delta" placeholder="delta fraction (modified secant, e.g. 1e-3)">
+      <input name="lambda_val" placeholder="lambda (fixed point relaxation, e.g. 0.1)">
+      <input name="g_func" placeholder="g(x) for fixed point (optional)">
+    </div>
+
+    <button type="submit">Compute</button>
+  </form>
+
+  {% if result %}
+    <h3>Result</h3>
+    <p>Method: {{ method }}</p>
+    <p>Estimated root: <strong>{{ root }}</strong> — final error: {{ err }} — iterations: {{ iters }}</p>
+
+    <h4>Iterations</h4>
+    <table>
+      <thead>
+        <tr>
+          {% for key in rows[0].keys() %}
+            <th>{{ key }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            {% for v in r.values() %}
+              <td>{{ v }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</body>
+</html>
